@@ -1,6 +1,7 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
-
+use std::fs::File;
+use std::io::Write;
 use airplay2_protocol::airplay::airplay_consumer::{AirPlayConsumer, ArcAirPlayConsumer};
 use airplay2_protocol::airplay::server::AudioPacket;
 use airplay2_protocol::airplay::AirPlayConfigBuilder;
@@ -48,6 +49,17 @@ impl AirPlayConsumer for VideoConsumer {
 
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
+    // 创建一个文件用于日志输出
+    let file = File::create("log.txt").unwrap();
+    let mut writer = std::io::BufWriter::new(file);
+
+    // 初始化env_logger
+    env_logger::Builder::new()
+        .format(|buf, record| writeln!(buf, "{}", record.args())) // 设置日志格式
+        .target(env_logger::Target::Pipe(Box::new(writer))) // 设置日志输出目标为文件
+        .filter(None, log::LevelFilter::Trace) // 设置日志级别
+        .init(); // 初始化env_logger
+
     let port = 31927;
     let name = "RustAirplay";
 
@@ -59,7 +71,7 @@ async fn main() -> tokio::io::Result<()> {
         .height(1080)
         .fps(30)
         .volume(0.5)
-        .pin_pwd("123321")
+        //.pin_pwd("123321")
         .build();
     let video_consumer: ArcAirPlayConsumer = Arc::new(VideoConsumer);
     let mserver = MServer::bind_with_addr(

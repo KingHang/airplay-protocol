@@ -20,6 +20,7 @@ curve25519-dalek = { version = "4.1.3", features = ["rand_core"] }
 default-net = "0.22"
 ed25519 = "2"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+env_logger = "0.11.5"
 futures = "0.3"
 # gstreamer = "0.20"
 hex = "0.4"
